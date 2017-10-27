@@ -14,19 +14,20 @@ class Rpc extends Base
   protected $cacheDir;
   protected $config;
 
-  public function __construct($server_type)
+  public function __construct($opt = '')
   {
-    $this->server_type = $server_type;
-    // $this->config = require(__ROOT__."config/rpc.php");
+    if ($opt['host']) {
+      $this->host = $opt['host'];
+    }
+    if ($opt['port']) {
+      $this->port = $opt['port'];
+    }
+    if ($opt['debug']) {
+      $this->debug = $opt['debug'];
+    }
 
-    $config = [
-      'type'   => 'redis',
-      'password'=>'asdfghjkl',
-      'prefix' => 'gm-',
-      'port' => '6666',
-      'host'       => 'redis2.baian.info',
-    ];
-    Cache::init($config);
+
+    Cache::init($this->redis_cfg);
     
     $this->cacheDir = './runtime';
 
@@ -44,7 +45,7 @@ class Rpc extends Base
     $this->mkDir($this->cacheDir."/center.pid");
     file_put_contents($this->cacheDir."/center.pid", $pid);
 
-    $this->server = new \swoole_server('0.0.0.0', 9911, SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
+    $this->server = new \swoole_server($this->host, $this->port, SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
 
     $config = [
           //'daemonize' => true,
@@ -68,6 +69,7 @@ class Rpc extends Base
     $this->server->on('Receive', array($this, 'onReceive'));
     $this->server->on("Close",array($this, 'onClose'));
     $this->server->on("Shutdown",array($this, 'onShutdown'));
+    $this->server->on("Start",array($this, 'onStart'));
 
 
     $this->server->on('Task', array($this, 'onTask'));
@@ -75,7 +77,15 @@ class Rpc extends Base
     $this->server->on("PipeMessage",array($this, 'onPipeMessage'));
 
 
-    $this->server->start();
+    
+    $r = $this->server->start();
+
+  }
+
+  public function onStart($value='')
+  {
+    $info = "#{$this->host}:{$this->port}\t [服务上线成功]";
+    $this->show($info);
   }
 
   public function onWorkerStart($server, $worker_id)

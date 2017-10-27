@@ -4,6 +4,13 @@ namespace ayhome\center;
 use think\Db;
 class Base
 {
+
+  public $host = '0.0.0.0';
+  public $port = 9911;
+
+  public $redis_cfg = array();
+
+
   protected $Agents,$Tasks;
   protected $onlineCli;
 
