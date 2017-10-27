@@ -1,5 +1,6 @@
 {
     "name": "ayhome/gm-center",
+    "type": "library",
     "description": "center thinkphp5",
     "license": "Apache-2.0",
     "authors": [
@@ -7,12 +8,5 @@
             "name": "ayhome",
             "email": "ayhome@foxmail.com"
         }
-    ],
-    "autoload": {
-        "psr-4": {
-            "ayhome\\agent\\": "src"
-        },
-        "files": [
-        ]
-    }
+    ]
 }
